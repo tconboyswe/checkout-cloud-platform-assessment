@@ -40,3 +40,21 @@ variable "project_name" {
     error_message = "project_name must contain only lowercase letters, numbers, and hyphens."
   }
 }
+
+variable "vnet_address_space" {
+  description = "Address space CIDR blocks for the virtual network."
+  type        = list(string)
+  default     = ["10.10.0.0/16"]
+}
+
+variable "subnet_functions_address_prefix" {
+  description = "CIDR for the Function App VNet integration subnet."
+  type        = string
+  default     = "10.10.1.0/24"
+}
+
+variable "subnet_private_endpoints_address_prefix" {
+  description = "CIDR for the private endpoints subnet."
+  type        = string
+  default     = "10.10.2.0/24"
+}
