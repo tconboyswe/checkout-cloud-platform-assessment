@@ -1,8 +1,5 @@
-# Linux Function App hosting the internal ProcessMessage API.
-# EP1 (Elastic Premium) is used because regional VNet integration on the existing
-# delegated subnet requires a Premium plan — Consumption (Y1) does not support
-# VNet integration, and Flex Consumption (FC1) requires Microsoft.App/environments
-# subnet delegation instead of Microsoft.Web/serverFarms.
+# Linux Function App hosting the internal ProcessMessage API on Flex Consumption (FC1).
+# Flex Consumption supports regional VNet integration and avoids Elastic Premium VM quota.
 
 resource "azurerm_service_plan" "function" {
   name                = local.app_service_plan_name
@@ -14,21 +11,27 @@ resource "azurerm_service_plan" "function" {
   tags = local.common_tags
 }
 
-# Linux Function Apps require an Azure Files share for deployment content.
-resource "azurerm_storage_share" "function_content" {
-  name                 = local.function_content_share_name
-  storage_account_name = azurerm_storage_account.function.name
-  quota                = 5
+# Flex Consumption uses a blob container (not an Azure Files share) for deployment packages.
+resource "azurerm_storage_container" "function_deployments" {
+  name                  = local.function_storage_container_name
+  storage_account_id    = azurerm_storage_account.function.id
+  container_access_type = "private"
 }
 
-resource "azurerm_linux_function_app" "main" {
+resource "azurerm_function_app_flex_consumption" "main" {
   name                = local.function_app_name
   resource_group_name = data.azurerm_resource_group.main.name
   location            = local.resource_group_location
   service_plan_id     = azurerm_service_plan.function.id
 
-  storage_account_name       = azurerm_storage_account.function.name
-  storage_account_access_key = azurerm_storage_account.function.primary_access_key
+  storage_container_type      = "blobContainer"
+  storage_container_endpoint  = "${azurerm_storage_account.function.primary_blob_endpoint}${azurerm_storage_container.function_deployments.name}"
+  storage_authentication_type = "StorageAccountConnectionString"
+  storage_access_key          = azurerm_storage_account.function.primary_access_key
+  runtime_name                = var.function_worker_runtime
+  runtime_version             = var.function_dotnet_version
+  maximum_instance_count      = var.function_maximum_instance_count
+  instance_memory_in_mb       = var.function_instance_memory_mb
 
   https_only = true
 
@@ -43,16 +46,11 @@ resource "azurerm_linux_function_app" "main" {
   site_config {
     minimum_tls_version    = "1.2"
     vnet_route_all_enabled = true
-
-    application_stack {
-      dotnet_version = var.function_dotnet_version
-    }
   }
 
   app_settings = {
     FUNCTIONS_EXTENSION_VERSION = "~4"
     FUNCTIONS_WORKER_RUNTIME    = var.function_worker_runtime
-    WEBSITE_CONTENTSHARE        = azurerm_storage_share.function_content.name
     WEBSITE_RUN_FROM_PACKAGE    = "1"
   }
 

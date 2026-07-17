@@ -60,9 +60,9 @@ variable "subnet_private_endpoints_address_prefix" {
 }
 
 variable "function_app_sku" {
-  description = "App Service plan SKU for the Function App. EP1 is required for regional VNet integration on the existing Microsoft.Web/serverFarms delegated subnet."
+  description = "App Service plan SKU for the Function App. FC1 is the Flex Consumption plan."
   type        = string
-  default     = "EP1"
+  default     = "FC1"
 }
 
 variable "function_worker_runtime" {
@@ -72,7 +72,19 @@ variable "function_worker_runtime" {
 }
 
 variable "function_dotnet_version" {
-  description = ".NET version for the Function App application stack."
+  description = ".NET version for the Function App runtime."
   type        = string
   default     = "8.0"
+}
+
+variable "function_maximum_instance_count" {
+  description = "Maximum instance count for Flex Consumption scale-out."
+  type        = number
+  default     = 40
+}
+
+variable "function_instance_memory_mb" {
+  description = "Instance memory size in MB for Flex Consumption."
+  type        = number
+  default     = 2048
 }
