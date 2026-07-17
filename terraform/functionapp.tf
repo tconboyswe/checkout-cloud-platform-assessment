@@ -28,8 +28,8 @@ resource "azurerm_function_app_flex_consumption" "main" {
   storage_container_endpoint  = "${azurerm_storage_account.function.primary_blob_endpoint}${azurerm_storage_container.function_deployments.name}"
   storage_authentication_type = "StorageAccountConnectionString"
   storage_access_key          = azurerm_storage_account.function.primary_access_key
-  runtime_name                = var.function_worker_runtime
-  runtime_version             = var.function_dotnet_version
+  runtime_name                = "dotnet-isolated"
+  runtime_version             = "8.0"
   maximum_instance_count      = var.function_maximum_instance_count
   instance_memory_in_mb       = var.function_instance_memory_mb
 
@@ -46,12 +46,6 @@ resource "azurerm_function_app_flex_consumption" "main" {
   site_config {
     minimum_tls_version    = "1.2"
     vnet_route_all_enabled = true
-  }
-
-  app_settings = {
-    FUNCTIONS_EXTENSION_VERSION = "~4"
-    FUNCTIONS_WORKER_RUNTIME    = var.function_worker_runtime
-    WEBSITE_RUN_FROM_PACKAGE    = "1"
   }
 
   tags = local.common_tags
