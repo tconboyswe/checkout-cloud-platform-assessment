@@ -58,3 +58,21 @@ variable "subnet_private_endpoints_address_prefix" {
   type        = string
   default     = "10.10.2.0/24"
 }
+
+variable "function_app_sku" {
+  description = "App Service plan SKU for the Function App. EP1 is required for regional VNet integration on the existing Microsoft.Web/serverFarms delegated subnet."
+  type        = string
+  default     = "EP1"
+}
+
+variable "function_worker_runtime" {
+  description = "Functions worker runtime identifier."
+  type        = string
+  default     = "dotnet-isolated"
+}
+
+variable "function_dotnet_version" {
+  description = ".NET version for the Function App application stack."
+  type        = string
+  default     = "8.0"
+}

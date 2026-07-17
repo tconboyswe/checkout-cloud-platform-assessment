@@ -22,3 +22,13 @@ output "storage_account_id" {
   description = "Resource ID of the Function App storage account."
   value       = azurerm_storage_account.function.id
 }
+
+output "function_app_name" {
+  description = "Name of the Function App."
+  value       = azurerm_linux_function_app.main.name
+}
+
+output "function_app_principal_id" {
+  description = "Principal ID of the Function App system-assigned managed identity."
+  value       = azurerm_linux_function_app.main.identity[0].principal_id
+}

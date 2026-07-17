@@ -24,6 +24,9 @@ locals {
   log_analytics_name    = "${local.name_prefix}-log"
   apim_name             = "${local.name_prefix}-apim"
 
+  # Azure Files share for Linux Function App deployment content (3-63 chars, lowercase)
+  function_content_share_name = lower(local.function_app_name)
+
   # Location taken from the existing resource group to avoid region mismatches
   resource_group_location = data.azurerm_resource_group.main.location
 
