@@ -3,7 +3,7 @@
 # delegation and network policy requirements do not conflict.
 
 resource "azurerm_virtual_network" "main" {
-  name                = "${local.name_prefix}-vnet"
+  name                = local.vnet_name
   location            = local.resource_group_location
   resource_group_name = data.azurerm_resource_group.main.name
   address_space       = var.vnet_address_space
@@ -14,7 +14,7 @@ resource "azurerm_virtual_network" "main" {
 # Dedicated to Azure Function regional VNet integration.
 # Delegated to Microsoft.Web/serverFarms — this subnet cannot host private endpoints.
 resource "azurerm_subnet" "functions" {
-  name                 = "snet-functions"
+  name                 = local.subnet_functions_name
   resource_group_name  = data.azurerm_resource_group.main.name
   virtual_network_name = azurerm_virtual_network.main.name
   address_prefixes     = [var.subnet_functions_address_prefix]
@@ -35,7 +35,7 @@ resource "azurerm_subnet" "functions" {
 # Network policies must be disabled so private endpoint traffic is not blocked by
 # route tables or NSGs applied at the subnet level.
 resource "azurerm_subnet" "private_endpoints" {
-  name                 = "snet-private-endpoints"
+  name                 = local.subnet_private_endpoints_name
   resource_group_name  = data.azurerm_resource_group.main.name
   virtual_network_name = azurerm_virtual_network.main.name
   address_prefixes     = [var.subnet_private_endpoints_address_prefix]
@@ -46,7 +46,7 @@ resource "azurerm_subnet" "private_endpoints" {
 # Restrict inbound access to the Function integration subnet to HTTPS from within the VNet.
 # APIM and other internal callers will reach the Function over this path.
 resource "azurerm_network_security_group" "functions" {
-  name                = "${local.name_prefix}-nsg-functions"
+  name                = local.nsg_functions_name
   location            = local.resource_group_location
   resource_group_name = data.azurerm_resource_group.main.name
 
@@ -79,7 +79,7 @@ resource "azurerm_network_security_group" "functions" {
 
 # Allow only the Function subnet to reach private endpoints over HTTPS.
 resource "azurerm_network_security_group" "private_endpoints" {
-  name                = "${local.name_prefix}-nsg-private-endpoints"
+  name                = local.nsg_private_endpoints_name
   location            = local.resource_group_location
   resource_group_name = data.azurerm_resource_group.main.name
 
