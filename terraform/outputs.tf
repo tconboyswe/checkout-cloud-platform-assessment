@@ -25,10 +25,10 @@ output "storage_account_id" {
 
 output "function_app_name" {
   description = "Name of the Function App."
-  value       = azurerm_linux_function_app.main.name
+  value       = azurerm_function_app_flex_consumption.main.name
 }
 
 output "function_app_principal_id" {
   description = "Principal ID of the Function App system-assigned managed identity."
-  value       = azurerm_linux_function_app.main.identity[0].principal_id
+  value       = azurerm_function_app_flex_consumption.main.identity[0].principal_id
 }

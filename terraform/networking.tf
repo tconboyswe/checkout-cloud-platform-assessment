@@ -11,8 +11,8 @@ resource "azurerm_virtual_network" "main" {
   tags = local.common_tags
 }
 
-# Dedicated to Azure Function regional VNet integration.
-# Delegated to Microsoft.Web/serverFarms — this subnet cannot host private endpoints.
+# Dedicated to Azure Function regional VNet integration (Flex Consumption).
+# Delegated to Microsoft.App/environments — required for Flex Consumption VNet integration.
 resource "azurerm_subnet" "functions" {
   name                 = local.subnet_functions_name
   resource_group_name  = data.azurerm_resource_group.main.name
@@ -20,12 +20,12 @@ resource "azurerm_subnet" "functions" {
   address_prefixes     = [var.subnet_functions_address_prefix]
 
   delegation {
-    name = "function-app-delegation"
+    name = "flex-consumption-delegation"
 
     service_delegation {
-      name = "Microsoft.Web/serverFarms"
+      name = "Microsoft.App/environments"
       actions = [
-        "Microsoft.Network/virtualNetworks/subnets/action",
+        "Microsoft.Network/virtualNetworks/subnets/join/action",
       ]
     }
   }
