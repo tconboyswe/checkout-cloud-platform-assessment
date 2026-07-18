@@ -15,13 +15,20 @@ resource "azurerm_key_vault" "main" {
   enabled_for_template_deployment = false
   soft_delete_retention_days      = 7
   purge_protection_enabled        = true
-  public_network_access_enabled   = false
+  public_network_access_enabled   = var.key_vault_public_network_access_enabled
+
+  # Deny all public data-plane access by default; permit only explicitly listed IPs.
+  network_acls {
+    default_action = "Deny"
+    bypass         = "None"
+    ip_rules       = var.key_vault_allowed_ip_rules
+  }
 
   tags = local.common_tags
 }
 
-# Allows Terraform to import certificates during apply. ARM control plane access is
-# unaffected by public_network_access_enabled = false.
+# Allows Terraform to import certificates during apply when the caller's public IP
+# is included in key_vault_allowed_ip_rules.
 resource "azurerm_role_assignment" "key_vault_terraform_admin" {
   scope                = azurerm_key_vault.main.id
   role_definition_name = "Key Vault Administrator"
