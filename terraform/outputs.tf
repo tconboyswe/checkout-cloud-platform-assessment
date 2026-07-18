@@ -74,7 +74,7 @@ output "application_insights_connection_string" {
   sensitive   = true
 }
 
-output "function_http5xx_alert_name" {
-  description = "Name of the Function App HTTP 5xx metric alert."
-  value       = azurerm_monitor_metric_alert.function_http5xx.name
+output "function_memory_alert_name" {
+  description = "Name of the Function App memory usage metric alert."
+  value       = azurerm_monitor_metric_alert.function_memory.name
 }

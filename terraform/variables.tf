@@ -137,9 +137,9 @@ variable "alert_severity" {
 }
 
 variable "alert_threshold" {
-  description = "Number of HTTP 5xx responses in the evaluation window that triggers the alert."
+  description = "Average memory working set threshold in bytes that triggers the alert (default 1610612736 = 1.5 GiB)."
   type        = number
-  default     = 0
+  default     = 1610612736
 }
 
 variable "alert_evaluation_frequency" {
