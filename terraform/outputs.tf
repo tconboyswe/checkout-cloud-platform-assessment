@@ -52,3 +52,29 @@ output "key_vault_certificate_name" {
   description = "Name of the self-signed certificate stored in Key Vault."
   value       = azurerm_key_vault_certificate.assessment.name
 }
+
+output "log_analytics_workspace_name" {
+  description = "Name of the Log Analytics Workspace."
+  value       = azurerm_log_analytics_workspace.main.name
+}
+
+output "log_analytics_workspace_id" {
+  description = "Resource ID of the Log Analytics Workspace."
+  value       = azurerm_log_analytics_workspace.main.id
+}
+
+output "application_insights_name" {
+  description = "Name of the Application Insights component."
+  value       = azurerm_application_insights.main.name
+}
+
+output "application_insights_connection_string" {
+  description = "Connection string for the Application Insights component."
+  value       = azurerm_application_insights.main.connection_string
+  sensitive   = true
+}
+
+output "function_http5xx_alert_name" {
+  description = "Name of the Function App HTTP 5xx metric alert."
+  value       = azurerm_monitor_metric_alert.function_http5xx.name
+}

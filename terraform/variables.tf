@@ -112,3 +112,44 @@ variable "key_vault_allowed_ip_rules" {
   type        = list(string)
   default     = []
 }
+
+variable "log_analytics_retention_in_days" {
+  description = "Log Analytics Workspace retention period in days."
+  type        = number
+  default     = 30
+}
+
+variable "alert_email_receivers" {
+  description = "Optional email addresses to receive alert notifications. Leave empty to deploy without an action group."
+  type        = list(string)
+  default     = []
+}
+
+variable "alert_severity" {
+  description = "Azure Monitor alert severity (0 = Critical, 1 = Error, 2 = Warning, 3 = Informational, 4 = Verbose)."
+  type        = number
+  default     = 2
+
+  validation {
+    condition     = var.alert_severity >= 0 && var.alert_severity <= 4
+    error_message = "alert_severity must be between 0 and 4."
+  }
+}
+
+variable "alert_threshold" {
+  description = "Number of HTTP 5xx responses in the evaluation window that triggers the alert."
+  type        = number
+  default     = 0
+}
+
+variable "alert_evaluation_frequency" {
+  description = "How often the alert rule is evaluated (ISO 8601 duration, e.g. PT5M)."
+  type        = string
+  default     = "PT5M"
+}
+
+variable "alert_window_size" {
+  description = "Time window over which the alert metric is aggregated (ISO 8601 duration, e.g. PT5M)."
+  type        = string
+  default     = "PT5M"
+}
