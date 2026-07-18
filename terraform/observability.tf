@@ -1,8 +1,8 @@
 # Observability platform: Log Analytics, Application Insights, and operational alerting.
 
 locals {
-  function_memory_alert_name = "${local.name_prefix}-func-memory"
-  monitor_action_group_name  = "${local.name_prefix}-ag"
+  function_http5xx_alert_name = "${local.name_prefix}-func-http5xx"
+  monitor_action_group_name   = "${local.name_prefix}-ag"
 }
 
 resource "azurerm_log_analytics_workspace" "main" {
@@ -44,27 +44,22 @@ resource "azurerm_monitor_action_group" "main" {
   tags = local.common_tags
 }
 
-# AverageMemoryWorkingSet is exposed by Flex Consumption (Microsoft.Web/sites); Http5xx is not.
-moved {
-  from = azurerm_monitor_metric_alert.function_http5xx
-  to   = azurerm_monitor_metric_alert.function_memory
-}
-
-resource "azurerm_monitor_metric_alert" "function_memory" {
-  name                = local.function_memory_alert_name
+# Metric alert on Http5xx is used because it is reliably emitted by the Function App
+# platform (Microsoft.Web/sites) without waiting for custom telemetry ingestion.
+resource "azurerm_monitor_metric_alert" "function_http5xx" {
+  name                = local.function_http5xx_alert_name
   resource_group_name = data.azurerm_resource_group.main.name
   scopes              = [azurerm_function_app_flex_consumption.main.id]
-  description         = "Function App average memory working set exceeded the configured threshold."
+  description         = "Function App returned HTTP 5xx responses during the evaluation window."
   severity            = var.alert_severity
   frequency           = var.alert_evaluation_frequency
   window_size         = var.alert_window_size
   enabled             = true
-  auto_mitigate       = true
 
   criteria {
     metric_namespace = "Microsoft.Web/sites"
-    metric_name      = "AverageMemoryWorkingSet"
-    aggregation      = "Average"
+    metric_name      = "Http5xx"
+    aggregation      = "Total"
     operator         = "GreaterThan"
     threshold        = var.alert_threshold
   }
