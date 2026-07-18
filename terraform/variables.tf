@@ -100,3 +100,15 @@ variable "certificate_organization" {
   type        = string
   default     = "Checkout Assessment"
 }
+
+variable "key_vault_public_network_access_enabled" {
+  description = "Whether Key Vault accepts public network traffic. Set to false after local certificate deployment is complete."
+  type        = bool
+  default     = true
+}
+
+variable "key_vault_allowed_ip_rules" {
+  description = "Public IP CIDR ranges allowed to reach the Key Vault data plane (e.g. [\"203.0.113.10/32\"] for a single workstation)."
+  type        = list(string)
+  default     = []
+}
