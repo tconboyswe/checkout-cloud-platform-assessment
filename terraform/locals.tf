@@ -19,10 +19,14 @@ locals {
   # Reserved for upcoming resources — keeps naming consistent across the module
   function_app_name     = "${local.name_prefix}-func"
   app_service_plan_name = "${local.name_prefix}-asp"
-  key_vault_name        = "${local.name_prefix}-kv"
-  app_insights_name     = "${local.name_prefix}-appi"
-  log_analytics_name    = "${local.name_prefix}-log"
-  apim_name             = "${local.name_prefix}-apim"
+  # Key Vault names are globally unique and limited to 24 characters.
+  key_vault_name                  = substr("${local.name_prefix_compact}kv", 0, 24)
+  key_vault_private_endpoint_name = "${local.name_prefix}-kv-pe"
+  key_vault_dns_link_name         = "${local.name_prefix}-kv-dns-link"
+  assessment_certificate_name     = "${local.name_prefix}-cert"
+  app_insights_name               = "${local.name_prefix}-appi"
+  log_analytics_name              = "${local.name_prefix}-log"
+  apim_name                       = "${local.name_prefix}-apim"
 
   # Blob container for Flex Consumption deployment packages
   function_storage_container_name = "${local.name_prefix}-deployments"

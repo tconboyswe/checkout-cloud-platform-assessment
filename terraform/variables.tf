@@ -88,3 +88,15 @@ variable "function_instance_memory_mb" {
   type        = number
   default     = 2048
 }
+
+variable "certificate_common_name" {
+  description = "Common name (CN) for the self-signed assessment certificate."
+  type        = string
+  default     = "checkout-assessment-dev.internal"
+}
+
+variable "certificate_organization" {
+  description = "Organization (O) for the self-signed assessment certificate subject."
+  type        = string
+  default     = "Checkout Assessment"
+}

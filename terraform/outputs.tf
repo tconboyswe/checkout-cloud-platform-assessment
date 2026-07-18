@@ -32,3 +32,23 @@ output "function_app_principal_id" {
   description = "Principal ID of the Function App system-assigned managed identity."
   value       = azurerm_function_app_flex_consumption.main.identity[0].principal_id
 }
+
+output "key_vault_name" {
+  description = "Name of the Key Vault."
+  value       = azurerm_key_vault.main.name
+}
+
+output "key_vault_uri" {
+  description = "URI of the Key Vault."
+  value       = azurerm_key_vault.main.vault_uri
+}
+
+output "key_vault_private_endpoint_ip" {
+  description = "Private IP address of the Key Vault private endpoint."
+  value       = azurerm_private_endpoint.keyvault.private_service_connection[0].private_ip_address
+}
+
+output "key_vault_certificate_name" {
+  description = "Name of the self-signed certificate stored in Key Vault."
+  value       = azurerm_key_vault_certificate.assessment.name
+}
