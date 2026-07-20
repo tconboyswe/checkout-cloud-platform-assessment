@@ -65,6 +65,33 @@ variable "subnet_apim_address_prefix" {
   default     = "10.10.3.0/27"
 }
 
+variable "apim_sku_name" {
+  description = "SKU and capacity for the API Management instance."
+  type        = string
+  default     = "Developer_1"
+
+  validation {
+    condition     = var.apim_sku_name == "Developer_1"
+    error_message = "apim_sku_name must be Developer_1 for this assessment deployment."
+  }
+}
+
+variable "apim_publisher_name" {
+  description = "Publisher name displayed by API Management."
+  type        = string
+  default     = "Checkout Assessment"
+}
+
+variable "apim_publisher_email" {
+  description = "Publisher email used by API Management."
+  type        = string
+
+  validation {
+    condition     = can(regex("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$", var.apim_publisher_email))
+    error_message = "apim_publisher_email must be a valid email address."
+  }
+}
+
 variable "function_app_sku" {
   description = "App Service plan SKU for the Function App. FC1 is the Flex Consumption plan."
   type        = string
