@@ -52,6 +52,7 @@ jobs:
       TF_VAR_location: uksouth
       TF_VAR_environment: dev
       TF_VAR_project_name: checkout-api
+      TF_VAR_apim_publisher_email: ${{ vars.APIM_PUBLISHER_EMAIL }}
 
     steps:
       - name: Checkout repository
