@@ -78,3 +78,23 @@ output "function_memory_alert_name" {
   description = "Name of the Function App memory usage metric alert."
   value       = azurerm_monitor_metric_alert.function_memory.name
 }
+
+output "apim_name" {
+  description = "Name of the API Management instance."
+  value       = azurerm_api_management.main.name
+}
+
+output "apim_id" {
+  description = "Resource ID of the API Management instance."
+  value       = azurerm_api_management.main.id
+}
+
+output "apim_gateway_url" {
+  description = "Default gateway URL of the API Management instance."
+  value       = azurerm_api_management.main.gateway_url
+}
+
+output "apim_private_ip_addresses" {
+  description = "Private IP addresses assigned to the internal API Management instance."
+  value       = azurerm_api_management.main.private_ip_addresses
+}
