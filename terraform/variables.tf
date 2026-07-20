@@ -59,6 +59,12 @@ variable "subnet_private_endpoints_address_prefix" {
   default     = "10.10.2.0/24"
 }
 
+variable "subnet_apim_address_prefix" {
+  description = "CIDR for the internal API Management subnet."
+  type        = string
+  default     = "10.10.3.0/27"
+}
+
 variable "function_app_sku" {
   description = "App Service plan SKU for the Function App. FC1 is the Flex Consumption plan."
   type        = string

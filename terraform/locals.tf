@@ -13,8 +13,10 @@ locals {
   vnet_name                     = "${local.name_prefix}-vnet"
   nsg_functions_name            = "${local.name_prefix}-nsg-functions"
   nsg_private_endpoints_name    = "${local.name_prefix}-nsg-private-endpoints"
+  nsg_apim_name                 = "${local.name_prefix}-nsg-apim"
   subnet_functions_name         = "${local.name_prefix}-snet-functions"
   subnet_private_endpoints_name = "${local.name_prefix}-snet-private-endpoints"
+  subnet_apim_name              = "${local.name_prefix}-snet-apim"
 
   # Reserved for upcoming resources — keeps naming consistent across the module
   function_app_name     = "${local.name_prefix}-func"

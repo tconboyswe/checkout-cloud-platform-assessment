@@ -43,6 +43,14 @@ resource "azurerm_subnet" "private_endpoints" {
   private_endpoint_network_policies = "Disabled"
 }
 
+# Dedicated to internal API Management (VNet-injected). No delegation required.
+resource "azurerm_subnet" "apim" {
+  name                 = local.subnet_apim_name
+  resource_group_name  = data.azurerm_resource_group.main.name
+  virtual_network_name = azurerm_virtual_network.main.name
+  address_prefixes     = [var.subnet_apim_address_prefix]
+}
+
 # Restrict inbound access to the Function integration subnet to HTTPS from within the VNet.
 # APIM and other internal callers will reach the Function over this path.
 resource "azurerm_network_security_group" "functions" {
@@ -98,6 +106,63 @@ resource "azurerm_network_security_group" "private_endpoints" {
   tags = local.common_tags
 }
 
+# Allow APIM management traffic and internal HTTPS callers; outbound access to Storage and the VNet.
+resource "azurerm_network_security_group" "apim" {
+  name                = local.nsg_apim_name
+  location            = local.resource_group_location
+  resource_group_name = data.azurerm_resource_group.main.name
+
+  security_rule {
+    name                       = "AllowInboundManagementFromApiManagement"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "3443"
+    source_address_prefix      = "ApiManagement"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "AllowInboundHttpsFromVirtualNetwork"
+    priority                   = 110
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "443"
+    source_address_prefix      = "VirtualNetwork"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "AllowOutboundHttpsToStorage"
+    priority                   = 100
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "443"
+    source_address_prefix      = "*"
+    destination_address_prefix = "Storage"
+  }
+
+  security_rule {
+    name                       = "AllowOutboundHttpsToVirtualNetwork"
+    priority                   = 110
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "443"
+    source_address_prefix      = "*"
+    destination_address_prefix = "VirtualNetwork"
+  }
+
+  tags = local.common_tags
+}
+
 resource "azurerm_subnet_network_security_group_association" "functions" {
   subnet_id                 = azurerm_subnet.functions.id
   network_security_group_id = azurerm_network_security_group.functions.id
@@ -106,4 +171,9 @@ resource "azurerm_subnet_network_security_group_association" "functions" {
 resource "azurerm_subnet_network_security_group_association" "private_endpoints" {
   subnet_id                 = azurerm_subnet.private_endpoints.id
   network_security_group_id = azurerm_network_security_group.private_endpoints.id
+}
+
+resource "azurerm_subnet_network_security_group_association" "apim" {
+  subnet_id                 = azurerm_subnet.apim.id
+  network_security_group_id = azurerm_network_security_group.apim.id
 }
