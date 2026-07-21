@@ -85,3 +85,9 @@ resource "azurerm_role_assignment" "function_key_vault_certificates_user" {
   role_definition_name = "Key Vault Certificate User"
   principal_id         = azurerm_function_app_flex_consumption.main.identity[0].principal_id
 }
+
+resource "azurerm_role_assignment" "apim_key_vault_secrets_user" {
+  scope                = azurerm_key_vault.main.id
+  role_definition_name = "Key Vault Secrets User"
+  principal_id         = azurerm_api_management.main.identity[0].principal_id
+}
