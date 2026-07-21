@@ -49,6 +49,8 @@ resource "azurerm_subnet" "apim" {
   resource_group_name  = data.azurerm_resource_group.main.name
   virtual_network_name = azurerm_virtual_network.main.name
   address_prefixes     = [var.subnet_apim_address_prefix]
+
+  service_endpoints = ["Microsoft.Web"]
 }
 
 # Restrict inbound access to the Function integration subnet to HTTPS from within the VNet.

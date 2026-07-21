@@ -44,10 +44,18 @@ resource "azurerm_function_app_flex_consumption" "main" {
   }
 
   site_config {
-    minimum_tls_version    = "1.2"
-    vnet_route_all_enabled = true
+    minimum_tls_version           = "1.2"
+    vnet_route_all_enabled        = true
+    ip_restriction_default_action = "Deny"
 
     application_insights_connection_string = azurerm_application_insights.main.connection_string
+
+    ip_restriction {
+      name                      = "AllowApiManagementSubnet"
+      priority                  = 100
+      action                    = "Allow"
+      virtual_network_subnet_id = azurerm_subnet.apim.id
+    }
   }
 
   tags = local.common_tags

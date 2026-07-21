@@ -28,6 +28,76 @@ resource "azurerm_api_management" "main" {
   ]
 }
 
+resource "azurerm_api_management_api" "process_message" {
+  name                  = local.apim_api_name
+  resource_group_name   = data.azurerm_resource_group.main.name
+  api_management_name   = azurerm_api_management.main.name
+  revision              = "1"
+  display_name          = "Process Message API"
+  path                  = "process-message"
+  protocols             = ["https"]
+  subscription_required = false
+}
+
+resource "azurerm_api_management_backend" "function" {
+  name                = local.apim_backend_name
+  resource_group_name = data.azurerm_resource_group.main.name
+  api_management_name = azurerm_api_management.main.name
+  protocol            = "http"
+  url                 = "https://${azurerm_function_app_flex_consumption.main.name}.azurewebsites.net/api"
+}
+
+resource "azurerm_api_management_api_operation" "process_message" {
+  operation_id        = "process-message"
+  api_name            = azurerm_api_management_api.process_message.name
+  api_management_name = azurerm_api_management.main.name
+  resource_group_name = data.azurerm_resource_group.main.name
+  display_name        = "Process Message"
+  method              = "POST"
+  url_template        = "/"
+
+  request {
+    description = "JSON payload containing a string message property."
+
+    representation {
+      content_type = "application/json"
+
+      example {
+        name  = "default"
+        value = jsonencode({ message = "hello" })
+      }
+    }
+  }
+}
+
+resource "azurerm_api_management_api_policy" "process_message" {
+  api_name            = azurerm_api_management_api.process_message.name
+  api_management_name = azurerm_api_management.main.name
+  resource_group_name = data.azurerm_resource_group.main.name
+
+  xml_content = <<POLICY
+<policies>
+  <inbound>
+    <base />
+    <set-header name="x-request-id" exists-action="skip">
+      <value>@(Guid.NewGuid().ToString())</value>
+    </set-header>
+    <set-backend-service backend-id="${azurerm_api_management_backend.function.name}" />
+    <rewrite-uri template="/process-message" />
+  </inbound>
+  <backend>
+    <base />
+  </backend>
+  <outbound>
+    <base />
+  </outbound>
+  <on-error>
+    <base />
+  </on-error>
+</policies>
+POLICY
+}
+
 resource "azurerm_private_dns_zone" "apim" {
   name                = "azure-api.net"
   resource_group_name = data.azurerm_resource_group.main.name

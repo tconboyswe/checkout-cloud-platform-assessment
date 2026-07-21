@@ -108,3 +108,13 @@ output "apim_private_dns_gateway_fqdn" {
   description = "Private DNS hostname for the internal API Management gateway."
   value       = "${azurerm_private_dns_a_record.apim_gateway.name}.${azurerm_private_dns_zone.apim.name}"
 }
+
+output "apim_process_message_url" {
+  description = "Internal API Management URL for the ProcessMessage operation."
+  value       = "${azurerm_api_management.main.gateway_url}/process-message"
+}
+
+output "apim_process_message_api_name" {
+  description = "Name of the ProcessMessage API registered in API Management."
+  value       = azurerm_api_management_api.process_message.name
+}
