@@ -21,10 +21,28 @@ resource "azurerm_api_management" "main" {
     type = "SystemAssigned"
   }
 
+  hostname_configuration {
+    proxy {
+      host_name                    = "${local.apim_name}.azure-api.net"
+      negotiate_client_certificate = true
+    }
+  }
+
   tags = local.common_tags
 
   depends_on = [
     azurerm_subnet_network_security_group_association.apim
+  ]
+}
+
+resource "azurerm_api_management_certificate" "client" {
+  name                = local.assessment_certificate_name
+  api_management_name = azurerm_api_management.main.name
+  resource_group_name = data.azurerm_resource_group.main.name
+  key_vault_secret_id = azurerm_key_vault_certificate.assessment.versionless_secret_id
+
+  depends_on = [
+    azurerm_role_assignment.apim_key_vault_secrets_user,
   ]
 }
 
@@ -79,6 +97,16 @@ resource "azurerm_api_management_api_policy" "process_message" {
 <policies>
   <inbound>
     <base />
+    <validate-client-certificate
+      validate-revocation="false"
+      validate-trust="false"
+      validate-not-before="true"
+      validate-not-after="true"
+      ignore-error="false">
+      <identities>
+        <identity thumbprint="${azurerm_api_management_certificate.client.thumbprint}" />
+      </identities>
+    </validate-client-certificate>
     <set-header name="x-request-id" exists-action="skip">
       <value>@(Guid.NewGuid().ToString())</value>
     </set-header>
