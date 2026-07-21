@@ -99,15 +99,25 @@ variable "function_app_sku" {
 }
 
 variable "function_worker_runtime" {
-  description = "Functions worker runtime identifier."
+  description = "Azure Functions worker runtime identifier."
   type        = string
-  default     = "dotnet-isolated"
+  default     = "python"
+
+  validation {
+    condition     = var.function_worker_runtime == "python"
+    error_message = "function_worker_runtime must be python for this assessment deployment."
+  }
 }
 
-variable "function_dotnet_version" {
-  description = ".NET version for the Function App runtime."
+variable "function_runtime_version" {
+  description = "Python runtime version used by the Function App."
   type        = string
-  default     = "8.0"
+  default     = "3.11"
+
+  validation {
+    condition     = var.function_runtime_version == "3.11"
+    error_message = "function_runtime_version must be 3.11 for this assessment deployment."
+  }
 }
 
 variable "function_maximum_instance_count" {

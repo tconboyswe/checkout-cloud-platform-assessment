@@ -29,7 +29,7 @@ resource "azurerm_function_app_flex_consumption" "main" {
   storage_authentication_type = "StorageAccountConnectionString"
   storage_access_key          = azurerm_storage_account.function.primary_access_key
   runtime_name                = var.function_worker_runtime
-  runtime_version             = var.function_dotnet_version
+  runtime_version             = var.function_runtime_version
   maximum_instance_count      = var.function_maximum_instance_count
   instance_memory_in_mb       = var.function_instance_memory_mb
 
