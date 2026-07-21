@@ -98,3 +98,13 @@ output "apim_private_ip_addresses" {
   description = "Private IP addresses assigned to the internal API Management instance."
   value       = azurerm_api_management.main.private_ip_addresses
 }
+
+output "apim_private_dns_zone_name" {
+  description = "Name of the private DNS zone used by the internal API Management gateway."
+  value       = azurerm_private_dns_zone.apim.name
+}
+
+output "apim_private_dns_gateway_fqdn" {
+  description = "Private DNS hostname for the internal API Management gateway."
+  value       = "${azurerm_private_dns_a_record.apim_gateway.name}.${azurerm_private_dns_zone.apim.name}"
+}
