@@ -35,17 +35,6 @@ resource "azurerm_api_management" "main" {
   ]
 }
 
-resource "azurerm_api_management_certificate" "client" {
-  name                = local.assessment_certificate_name
-  api_management_name = azurerm_api_management.main.name
-  resource_group_name = data.azurerm_resource_group.main.name
-  key_vault_secret_id = azurerm_key_vault_certificate.assessment.versionless_secret_id
-
-  depends_on = [
-    azurerm_role_assignment.apim_key_vault_secrets_user,
-  ]
-}
-
 resource "azurerm_api_management_api" "process_message" {
   name                  = local.apim_api_name
   resource_group_name   = data.azurerm_resource_group.main.name
@@ -104,7 +93,7 @@ resource "azurerm_api_management_api_policy" "process_message" {
       validate-not-after="true"
       ignore-error="false">
       <identities>
-        <identity thumbprint="${azurerm_api_management_certificate.client.thumbprint}" />
+        <identity thumbprint="${data.tls_certificate.assessment.certificates[0].sha1_fingerprint}" />
       </identities>
     </validate-client-certificate>
     <set-header name="x-request-id" exists-action="skip">
