@@ -30,6 +30,8 @@ locals {
   log_analytics_name              = "${local.name_prefix}-log"
   apim_name                       = "${local.name_prefix}-apim"
   apim_dns_link_name              = "${local.name_prefix}-apim-dns-link"
+  apim_api_name                   = "${local.name_prefix}-process-message-api"
+  apim_backend_name               = "${local.name_prefix}-function-backend"
 
   # Blob container for Flex Consumption deployment packages
   function_storage_container_name = "${local.name_prefix}-deployments"
