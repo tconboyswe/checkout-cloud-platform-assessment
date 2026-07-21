@@ -24,6 +24,10 @@ resource "tls_self_signed_cert" "assessment" {
   ]
 }
 
+data "tls_certificate" "assessment" {
+  content = tls_self_signed_cert.assessment.cert_pem
+}
+
 locals {
   # PEM bundle: PKCS#8 private key followed by the self-signed certificate.
   key_vault_certificate_pem = sensitive("${tls_private_key.assessment.private_key_pem_pkcs8}${tls_self_signed_cert.assessment.cert_pem}")
