@@ -2,7 +2,7 @@
 # Copy this file to terraform.tfvars and adjust as needed.
 # terraform.tfvars is gitignored and must not be committed.
 
-subscription_id     = "85196a81-87db-4711-abbc-01b9a8398af4"
+subscription_id     = "00000000-0000-0000-0000-000000000000"
 resource_group_name = "rg-checkout-assessment-dev"
 location            = "uksouth"
 project_name        = "checkout-assessment"
