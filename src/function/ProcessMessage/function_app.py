@@ -9,6 +9,7 @@ app = func.FunctionApp()
 
 
 def _resolve_request_id(req: func.HttpRequest) -> str:
+    # Use the caller's request ID when present, otherwise create one.
     request_id = req.headers.get("x-request-id", "").strip()
     if not request_id:
         request_id = str(uuid.uuid4())
@@ -16,6 +17,7 @@ def _resolve_request_id(req: func.HttpRequest) -> str:
 
 
 def _json_response(body: dict, status_code: int, request_id: str) -> func.HttpResponse:
+    # Return a consistent JSON response with the correlation header.
     return func.HttpResponse(
         body=json.dumps(body),
         status_code=status_code,
@@ -24,12 +26,16 @@ def _json_response(body: dict, status_code: int, request_id: str) -> func.HttpRe
     )
 
 
+# APIM provides authentication; the Function also restricts inbound traffic to
+# the APIM subnet, so a Function-level key is not required.
 @app.route(route="process-message", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
 def process_message(req: func.HttpRequest) -> func.HttpResponse:
+    # Validate and process a message submitted through the internal API.
     request_id = _resolve_request_id(req)
     logging.info("ProcessMessage request received. requestId=%s", request_id)
 
     try:
+        # Read bytes first so an empty body can be distinguished from invalid JSON.
         body_bytes = req.get_body()
         if not body_bytes:
             logging.warning(
@@ -43,6 +49,7 @@ def process_message(req: func.HttpRequest) -> func.HttpResponse:
                 request_id,
             )
 
+        # Decode and parse explicitly to handle malformed JSON and invalid UTF-8.
         try:
             payload = json.loads(body_bytes.decode("utf-8"))
         except (json.JSONDecodeError, UnicodeDecodeError):
@@ -57,6 +64,7 @@ def process_message(req: func.HttpRequest) -> func.HttpResponse:
                 request_id,
             )
 
+        # The request contract requires a JSON object with a non-empty string.
         if not isinstance(payload, dict):
             logging.warning(
                 "ProcessMessage validation failed. requestId=%s reason=%s",
@@ -118,6 +126,7 @@ def process_message(req: func.HttpRequest) -> func.HttpResponse:
                 request_id,
             )
 
+        # Generate the timestamp only after validation succeeds.
         timestamp = datetime.now(timezone.utc).isoformat()
         response_body = {
             "message": message,
@@ -127,6 +136,7 @@ def process_message(req: func.HttpRequest) -> func.HttpResponse:
         logging.info("ProcessMessage request processed successfully. requestId=%s", request_id)
         return _json_response(response_body, 200, request_id)
 
+    # Prevent implementation details from being exposed to API callers.
     except Exception:
         logging.exception("ProcessMessage unexpected error. requestId=%s", request_id)
         return _json_response(
