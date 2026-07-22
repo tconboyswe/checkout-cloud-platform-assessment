@@ -195,6 +195,14 @@ Because the assessment uses local Terraform state, the hosted CI plan validates 
 
 Local Terraform state was used for this assessment. A shared setup would use Azure Blob Storage, authenticate through OIDC and Microsoft Entra ID, and use Blob leases for state locking.
 
+## Assumptions
+
+- The solution is a simplified assessment implementation rather than a production-ready platform.
+- APIM is the only entry point to the Function, with direct access restricted.
+- Local Terraform state is acceptable for the assessment; production would use remote state in Azure Blob Storage.
+- The GitHub Actions workflow validates and plans infrastructure changes but does not automatically apply them.
+- A single development environment is sufficient for the assessment, with production expected to use separate environments and additional security controls.
+
 ## Known differences and next steps
 
 | Area | Current position | Intended improvement |
